@@ -77,6 +77,7 @@ def clean_data(df:pd.DataFrame,cols:list)-> pd.DataFrame:
     """
         removes Comments column and imputs cols passed
     """
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
     clean_data = df.drop(columns=['Comments']).ffill()
     for col in cols:
         clean_data[col]=clean_data[col].clip(lower=0)
