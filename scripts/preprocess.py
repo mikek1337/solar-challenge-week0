@@ -65,6 +65,14 @@ def find_and_replace_outliers_with_median(df, cols, iqr_multiplier=1.5):
 
     return df_cleaned
 
+def find_columns_with_missing_value(df:pd.DataFrame, threshold=0.05)->list:
+    null_columns = df.isnull().sum()
+    total_row = len(df)
+    null_percentage = (null_columns/total_row)*100;
+    missing_columns = df.columns[null_percentage > threshold]
+    print('columns above the threshold')
+    return missing_columns.to_list()
+
 def clean_data(df:pd.DataFrame,cols:list)-> pd.DataFrame:
     """
         removes Comments column and imputs cols passed
