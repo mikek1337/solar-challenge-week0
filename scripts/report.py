@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 def data_quality_report(df: pd.DataFrame) -> pd.DataFrame:
     """Generate comprehensive data quality report"""
     report = pd.DataFrame({
@@ -18,3 +19,17 @@ def data_quality_report(df: pd.DataFrame) -> pd.DataFrame:
         report.loc[col, 'Out of Range'] = ((df[col] < min_val) | (df[col] > max_val)).sum()
 
     return report
+
+def plot_time_series(df:pd.DataFrame):
+    plt.figure(figsize=(14, 8))
+    plot_cols = ['GHI', 'DNI', 'DHI', 'Tamb']
+
+    for col in plot_cols:
+        plt.plot(df['Timestamp'], df[col], label=col)
+
+    plt.xlabel('Timestamp')
+    plt.ylabel('Value')
+    plt.title('Time Series Analysis of GHI, DNI, DHI, Tamb')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
