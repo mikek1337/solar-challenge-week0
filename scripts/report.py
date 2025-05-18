@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sb
 def data_quality_report(df: pd.DataFrame) -> pd.DataFrame:
     """Generate comprehensive data quality report"""
     report = pd.DataFrame({
@@ -32,4 +33,10 @@ def plot_time_series(df:pd.DataFrame):
     plt.title('Time Series Analysis of GHI, DNI, DHI, Tamb')
     plt.legend()
     plt.tight_layout()
+    plt.show()
+
+def correlation_matrix(df:pd.DataFrame, cols:list, name:str):
+    plt.figure(figsize=(10, 8))
+    sb.heatmap(df[cols].corr(), annot=True, fmt='.2f', cmap='coolwarm', square=True)
+    plt.title(f'Correlation Matrix for {name}')
     plt.show()
