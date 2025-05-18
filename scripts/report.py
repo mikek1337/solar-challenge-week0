@@ -3,7 +3,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sb
 def data_quality_report(df: pd.DataFrame) -> pd.DataFrame:
-    """Generate comprehensive data quality report"""
+    """
+    Generates a data quality report for a given pandas DataFrame.
+    The report includes the following metrics for each column:
+    - Missing Values: Number of missing (NaN) values.
+    - Zero Values: Number of zero values.
+    - Negative Values: Number of negative values (for numeric columns only).
+    - Out of Range: For specific columns ('GHI', 'RH', 'Tamb'), counts values outside predefined valid ranges:
+        - 'GHI': 0 to 1500
+        - 'RH': 0 to 100
+        - 'Tamb': -20 to 60
+    Parameters:
+        df (pd.DataFrame): The input DataFrame to analyze.
+    Returns:
+        pd.DataFrame: A DataFrame summarizing data quality metrics for each column.
+    """
+    
     report = pd.DataFrame({
         'Missing Values': df.isna().sum(),
         'Zero Values': (df == 0).sum(),
@@ -22,6 +37,14 @@ def data_quality_report(df: pd.DataFrame) -> pd.DataFrame:
     return report
 
 def plot_time_series(df:pd.DataFrame):
+    """
+    Plots time series data for specified columns ('GHI', 'DNI', 'DHI', 'Tamb') from a DataFrame.
+    Parameters:
+        df (pd.DataFrame): Input DataFrame containing a 'Timestamp' column and the columns to plot.
+    Displays:
+        A matplotlib figure showing the time series of the selected columns against 'Timestamp'.
+    """
+
     plt.figure(figsize=(14, 8))
     plot_cols = ['GHI', 'DNI', 'DHI', 'Tamb']
 

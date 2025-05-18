@@ -66,6 +66,16 @@ def find_and_replace_outliers_with_median(df, cols, iqr_multiplier=1.5):
     return df_cleaned
 
 def find_columns_with_missing_value(df:pd.DataFrame, threshold=0.05)->list:
+    """
+    Identifies columns in a DataFrame with a proportion of missing values above a specified threshold.
+    Parameters:
+        df (pd.DataFrame): The input DataFrame to analyze for missing values.
+        threshold (float, optional): The minimum proportion (between 0 and 1) of missing values required for a column to be considered as having excessive missing data. Defaults to 0.05 (5%).
+    Returns:
+        list: A list of column names where the proportion of missing values exceeds the given threshold.
+    Prints:
+        A message indicating that columns above the threshold are being returned.
+    """
     null_columns = df.isnull().sum()
     total_row = len(df)
     null_percentage = (null_columns/total_row)*100;
@@ -75,8 +85,20 @@ def find_columns_with_missing_value(df:pd.DataFrame, threshold=0.05)->list:
 
 def clean_data(df:pd.DataFrame,cols:list)-> pd.DataFrame:
     """
-        removes Comments column and imputs cols passed
+    Cleans and preprocesses the input DataFrame by performing several operations:
+    1. Converts the 'Timestamp' column to datetime.
+    2. Drops the 'Comments' column and forward-fills missing values.
+    3. Clips the specified columns to have a minimum value of 0.
+    4. Clips the 'RH' column to be within the range [0, 100].
+    5. Replaces outliers in the specified columns and 'Tamb' with the median value.
+    6. Resets the DataFrame index.
+    Args:
+        df (pd.DataFrame): The input DataFrame containing the data to be cleaned.
+        cols (list): List of column names to clip and check for outliers.
+    Returns:
+        pd.DataFrame: The cleaned and preprocessed DataFrame with reset index.
     """
+    
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])
     clean_data = df.drop(columns=['Comments']).ffill()
     for col in cols:
