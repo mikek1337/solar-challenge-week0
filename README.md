@@ -24,4 +24,5 @@ Follow these steps to set up and run the project:
     ```
 
 4. **Running the notebooks**
-   ```bash make sure you create data folder on the root project to store your .csv files```
+   ```bash 
+   make sure you create data folder on the root project to store your .csv files```
