@@ -49,7 +49,8 @@ def plot_time_series(df:pd.DataFrame):
     plot_cols = ['GHI', 'DNI', 'DHI', 'Tamb']
 
     for col in plot_cols:
-        plt.plot(df['Timestamp'], df[col], label=col)
+        sb.lineplot(df, x='Timestamp', y=col)
+        #plt.plot(df['Timestamp'], df[col], label=col)
 
     plt.xlabel('Timestamp')
     plt.ylabel('Value')
@@ -59,7 +60,113 @@ def plot_time_series(df:pd.DataFrame):
     plt.show()
 
 def correlation_matrix(df:pd.DataFrame, cols:list, name:str):
+    """
+    Generates and displays a correlation matrix heatmap for the specified columns of a DataFrame.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame containing the data.
+        cols (list): List of column names to include in the correlation matrix.
+        name (str): A name or label to use in the plot title.
+
+    Displays:
+        A heatmap plot of the correlation matrix for the specified columns.
+    """
     plt.figure(figsize=(10, 8))
     sb.heatmap(df[cols].corr(), annot=True, fmt='.2f', cmap='coolwarm', square=True)
     plt.title(f'Correlation Matrix for {name}')
+    plt.show()
+
+def plot_bubble_chart(df:pd.DataFrame):
+    """
+    Plots a bubble chart of Global Horizontal Irradiance (GHI) versus ambient temperature (Tamb) with bubble sizes representing BP.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing at least the columns 'Tamb', 'GHI', and 'BP'.
+
+    Displays:
+        A matplotlib figure showing a scatter plot where:
+            - X-axis: 'Tamb' (ambient temperature)
+            - Y-axis: 'GHI' (Global Horizontal Irradiance)
+            - Bubble size: 'BP'
+    """
+    plt.figure(figsize=(10, 8))
+    sb.scatterplot(df,x='Tamb', y='GHI', size='RH', sizes=(20,200))
+    plt.title(f'Bubble chart GHI vs. Tamb')
+    plt.show()
+
+def plot_scatter_chart(df: pd.DataFrame):
+    """
+    Plots a scatter chart showing the relationship between wind speed (WS), wind gust (WSgust), wind direction (WD), and global horizontal irradiance (GHI).
+    """
+    cols = ['WS', 'WSgust', 'WD']
+    plt.figure(figsize=(10, 8))
+    for col in cols:
+        sb.scatterplot(df, x='WS', y='GHI', legend=True)
+        plt.title(f' GHI')
+        plt.show()  
+    sb.scatterplot(df, x='RH', y='Tamb')
+    plt.title(f' GHI')
+    plt.show()
+    sb.scatterplot(df, x='RH', y='GHI')
+    plt.title(f' GHI')
+    plt.show()
+   
+def plot_histogram_chart(df:pd.DataFrame):
+    """
+    Plots a 2D histogram chart of 'GHI' versus 'RH' from the given DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame containing at least the 'GHI' and 'RH' columns.
+
+    Displays:
+        A histogram plot with kernel density estimation (KDE) overlay, showing the distribution of 'GHI' and 'RH'.
+    """
+    plt.figure(figsize=(10, 8))
+    sb.histplot(df, x='GHI', y='RH', kde=True)
+    plt.xticks(ticks=df['GHI'], labels=df['RH']) 
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.title('GHI')
+    plt.show()
+
+def plot_avg_moda_modb(df:pd.DataFrame):
+    average_mod_by_cleaning = df.groupby('Cleaning')[['ModA', 'ModB']].mean().reset_index()
+    print(average_mod_by_cleaning)
+
+    combine = average_mod_by_cleaning.melt(
+        id_vars='Cleaning',
+        value_vars=['ModA', 'ModB'],
+        var_name='Module',
+        value_name='Avg value'
+    )
+    plt.figure(figsize=(8, 6))
+    sb.barplot(data=combine, x='Cleaning', y='Avg value', hue='Module')
+    plt.title('Average ModA and ModB by Cleaning Flag')
+    plt.xlabel('Cleaning Flag') # Assuming 0 and 1 represent different cleaning states
+    plt.ylabel('Average Module Value')
+    plt.xticks(ticks=average_mod_by_cleaning['Cleaning'], labels=average_mod_by_cleaning['Cleaning']) # Ensure all cleaning flags are shown on x-axis
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+def plot_redial(df:pd.DataFrame):
+    theta = np.deg2rad(df['WD'])
+    r = df['WS']
+    fig, ax = plt.subplots(figsize=(8, 8), subplot_kw={'projection': 'polar'})
+    ax.scatter(theta, r, alpha=0.5, s=5) 
+
+    
+    ax.set_theta_zero_location("E") 
+    ax.set_theta_direction(-1)     
+
+    ax.set_xticks(np.linspace(0, 2 * np.pi, 8, endpoint=False))
+    ax.set_xticklabels(['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'])
+    ax.set_title('Wind Speed vs. Wind Direction', va='bottom')
+    ax.grid(True)
+    plt.show()
+
+def plot_RH_relation(df:pd.DataFrame):
+    sb.lineplot(df, x='RH', y='Tamb')
+    plt.title(f' GHI')
+    plt.show()
+    sb.lineplot(df, x='RH', y='GHI')
+    plt.title(f' GHI')
     plt.show()
