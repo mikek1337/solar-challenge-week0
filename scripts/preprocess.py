@@ -30,17 +30,17 @@ def find_and_replace_outliers_with_median(df, cols, iqr_multiplier=1.5):
              continue
 
         # Calculate Q1, Q3, and IQR for the current column
-        Q1 = df_cleaned[col].quantile(0.25)
-        Q3 = df_cleaned[col].quantile(0.75)
-        IQR = Q3 - Q1
+        # Calculate the z-score for the current column
+        col_mean = df_cleaned[col].mean()
+        col_std = df_cleaned[col].std()
+        if col_std == 0:
+            print(f"Warning: Standard deviation is zero for column '{col}'. Skipping outlier detection/replacement.")
+            continue
 
-        # Define the lower and upper bounds for outlier detection
-        lower_bound = Q1 - iqr_multiplier * IQR
-        upper_bound = Q3 + iqr_multiplier * IQR
+        z_scores = (df_cleaned[col] - col_mean) / col_std
 
-        # Identify outliers in the current column
-        # Create a boolean mask: True for values outside the bounds
-        outlier_mask = (df_cleaned[col] < lower_bound) | (df_cleaned[col] > upper_bound)
+        
+        outlier_mask = (z_scores.abs() > 3)
 
         # Get the indices of the outliers for this specific column
         outlier_indices_col = df_cleaned.index[outlier_mask]
