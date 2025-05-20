@@ -158,6 +158,19 @@ def plot_histogram_chart(df:pd.DataFrame):
     plt.show()
 
 def plot_avg_moda_modb(df:pd.DataFrame):
+    """
+    Plots the average values of 'ModA' and 'ModB' columns grouped by the 'Cleaning' flag in the given DataFrame.
+
+    This function calculates the mean of 'ModA' and 'ModB' for each unique value in the 'Cleaning' column,
+    reshapes the data for plotting, and displays a bar plot comparing the average values of both modules
+    across different cleaning states.
+
+    Parameters:
+        df (pd.DataFrame): Input DataFrame containing at least the columns 'Cleaning', 'ModA', and 'ModB'.
+
+    Returns:
+        None: Displays a bar plot of the average values and prints the grouped averages.
+    """
     average_mod_by_cleaning = df.groupby('Cleaning')[['ModA', 'ModB']].mean().reset_index()
     print(average_mod_by_cleaning)
 

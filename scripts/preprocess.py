@@ -95,16 +95,49 @@ def clean_data(df:pd.DataFrame,cols:list)-> pd.DataFrame:
     return clean_data.reset_index(drop=True)
 
 def load_countries(paths:list):
+    """
+    Loads and concatenates country data from a list of file paths.
+
+    Args:
+        paths (list): A list of file paths, each containing country data.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the concatenated data from all provided file paths.
+    """
     full_df = pd.concat([load_country_data(path) for path in paths], ignore_index=True)
     return full_df
    
 def load_country_data(path:str):
+    """
+    Loads data from the specified file path, extracts the country name from the file path,
+    and adds it as a new column 'Country' to the DataFrame.
+
+    Args:
+        path (str): The file path to the data file. The country name is expected to be the first part
+            of the filename, separated by an underscore, and located in the third segment of the path.
+
+    Returns:
+        pandas.DataFrame: The loaded DataFrame with an additional 'Country' column.
+    """
     df = load_data(path)
     country = path.split('/')[2].split('_')[0]
     df['Country'] = country
     return df 
     
 def load_data(path:str):
+    """
+    Loads data from a CSV file at the specified path, parsing the 'Timestamp' column as dates.
+
+    Args:
+        path (str): The file path to the CSV file.
+
+    Returns:
+        pandas.DataFrame: The loaded data with parsed dates if successful.
+        None: If the provided path is not a string.
+
+    Raises:
+        None: Prints an error message if the path is not a string.
+    """
     try:
         return pd.read_csv(path, parse_dates=['Timestamp']);
     except TypeError:
