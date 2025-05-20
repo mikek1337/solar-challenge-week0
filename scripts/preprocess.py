@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 def find_and_replace_outliers_with_median(df, cols, threshold=3):
     """
     Detects outliers in specified numeric columns of a DataFrame using the z-score method and replaces them with the column median.
@@ -88,7 +89,7 @@ def clean_data(df:pd.DataFrame,cols:list)-> pd.DataFrame:
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])
     clean_data = df.drop(columns=['Comments']).ffill()
     for col in cols:
-        clean_data[col]=clean_data[col].clip(lower=0)
+        clean_data.loc[clean_data[col] < 0, col] = np.nan
     clean_data['RH'].clip(0, 100)
     clean_data = find_and_replace_outliers_with_median(clean_data, cols + ['Tamb'])
     
