@@ -1,21 +1,20 @@
 import pandas as pd
-def find_and_replace_outliers_with_median(df, cols, iqr_multiplier=1.5):
+def find_and_replace_outliers_with_median(df, cols, threshold=3):
     """
-    Finds outliers in specified columns using the IQR method and replaces them
-    with the median of their respective columns.
-
-    Args:
-        df (pd.DataFrame): The input pandas DataFrame.
-        cols (list): A list of column names to check for outliers and replace.
-        iqr_multiplier (float, optional): The multiplier for the IQR to define
-                                           the outlier bounds. Defaults to 1.5
-                                           (standard for box plots).
-
+    Detects outliers in specified numeric columns of a DataFrame using the z-score method and replaces them with the column median.
+    Parameters:
+        df (pd.DataFrame): The input DataFrame to process.
+        cols (list of str): List of column names to check for outliers and replace them.
+        threshold (float, optional): The z-score threshold to identify outliers. Default is 3.
     Returns:
-        pd.DataFrame: A new DataFrame with outliers replaced by the median.
-                      Returns a copy, the original DataFrame is not modified.
+        pd.DataFrame: A copy of the DataFrame with outliers in the specified columns replaced by the median value of each column.
+    Notes:
+        - Only numeric columns are processed; non-numeric columns are skipped with a warning.
+        - If a column's standard deviation is zero, outlier detection is skipped for that column.
+        - Outliers are defined as values with an absolute z-score greater than the specified threshold.
+        - The function prints progress and warnings during execution.
     """
-    df_cleaned = df.copy() # Create a copy to avoid modifying the original DataFrame
+    df_cleaned = df.copy()  # Create a copy to avoid modifying the original DataFrame
 
     print(f"Processing columns: {cols}")
 
@@ -24,13 +23,11 @@ def find_and_replace_outliers_with_median(df, cols, iqr_multiplier=1.5):
             print(f"Warning: Column '{col}' not found in DataFrame. Skipping.")
             continue
 
-        # Ensure the column is numeric, as IQR and median are for numerical data
+        # Ensure the column is numeric
         if not pd.api.types.is_numeric_dtype(df_cleaned[col]):
-             print(f"Warning: Column '{col}' is not numeric. Skipping outlier detection/replacement.")
-             continue
+            print(f"Warning: Column '{col}' is not numeric. Skipping outlier detection/replacement.")
+            continue
 
-        # Calculate Q1, Q3, and IQR for the current column
-        # Calculate the z-score for the current column
         col_mean = df_cleaned[col].mean()
         col_std = df_cleaned[col].std()
         if col_std == 0:
@@ -38,29 +35,18 @@ def find_and_replace_outliers_with_median(df, cols, iqr_multiplier=1.5):
             continue
 
         z_scores = (df_cleaned[col] - col_mean) / col_std
-
-        
-        outlier_mask = (z_scores.abs() > 3)
-
-        # Get the indices of the outliers for this specific column
+        outlier_mask = z_scores.abs() > threshold
         outlier_indices_col = df_cleaned.index[outlier_mask]
 
-        # Check if any outliers were found in this column
         if len(outlier_indices_col) == 0:
-            print(f"No outliers found in column '{col}' using IQR multiplier {iqr_multiplier}.")
+            print(f"No outliers found in column '{col}' using z-score threshold {threshold}.")
             continue
 
         print(f"Found {len(outlier_indices_col)} outliers in column '{col}'.")
-        # print(f"Outlier indices in '{col}': {outlier_indices_col.tolist()}") # Uncomment to see indices
-
-        # Calculate the median for the current column
         median_value = df_cleaned[col].median()
-
         print(f"Median value for '{col}' (used for replacement): {median_value}")
 
-        # Replace the outlier values with the calculated median
         df_cleaned.loc[outlier_indices_col, col] = median_value
-
         print(f"Outliers in column '{col}' replaced with median.")
 
     return df_cleaned
@@ -107,3 +93,20 @@ def clean_data(df:pd.DataFrame,cols:list)-> pd.DataFrame:
     clean_data = find_and_replace_outliers_with_median(clean_data, cols + ['Tamb'])
     
     return clean_data.reset_index(drop=True)
+
+def load_countries(paths:list):
+    full_df = pd.concat([load_country_data(path) for path in paths], ignore_index=True)
+    return full_df
+   
+def load_country_data(path:str):
+    df = load_data(path)
+    country = path.split('/')[2].split('_')[0]
+    df['Country'] = country
+    return df 
+    
+def load_data(path:str):
+    try:
+        return pd.read_csv(path, parse_dates=['Timestamp']);
+    except TypeError:
+        print("Path not a string")
+        return
