@@ -96,39 +96,81 @@ def plot_bubble_chart(df:pd.DataFrame):
 
 def plot_scatter_chart(df: pd.DataFrame):
     """
-    Plots a scatter chart showing the relationship between wind speed (WS), wind gust (WSgust), wind direction (WD), and global horizontal irradiance (GHI).
+    Plots scatter charts to visualize relationships between wind and irradiance variables.
+    - WS vs GHI
+    - WSgust vs GHI
+    - WD vs GHI
+    - RH vs Tamb
+    - RH vs GHI
     """
-    cols = ['WS', 'WSgust', 'WD']
-    plt.figure(figsize=(10, 8))
-    for col in cols:
-        sb.scatterplot(df, x='WS', y='GHI', legend=True)
-        plt.title(f' GHI')
-        plt.show()  
-    sb.scatterplot(df, x='RH', y='Tamb')
-    plt.title(f' GHI')
+    plt.figure(figsize=(10, 6))
+    sb.scatterplot(data=df, x='WS', y='GHI')
+    plt.title('Wind Speed (WS) vs Global Horizontal Irradiance (GHI)')
+    plt.xlabel('Wind Speed (WS)')
+    plt.ylabel('GHI')
     plt.show()
-    sb.scatterplot(df, x='RH', y='GHI')
-    plt.title(f' GHI')
+
+    plt.figure(figsize=(10, 6))
+    sb.scatterplot(data=df, x='WSgust', y='GHI')
+    plt.title('Wind Gust (WSgust) vs Global Horizontal Irradiance (GHI)')
+    plt.xlabel('Wind Gust (WSgust)')
+    plt.ylabel('GHI')
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    sb.scatterplot(data=df, x='WD', y='GHI')
+    plt.title('Wind Direction (WD) vs Global Horizontal Irradiance (GHI)')
+    plt.xlabel('Wind Direction (WD)')
+    plt.ylabel('GHI')
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    sb.scatterplot(data=df, x='RH', y='Tamb')
+    plt.title('Relative Humidity (RH) vs Ambient Temperature (Tamb)')
+    plt.xlabel('Relative Humidity (RH)')
+    plt.ylabel('Ambient Temperature (Tamb)')
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    sb.scatterplot(data=df, x='RH', y='GHI')
+    plt.title('Relative Humidity (RH) vs Global Horizontal Irradiance (GHI)')
+    plt.xlabel('Relative Humidity (RH)')
+    plt.ylabel('GHI')
     plt.show()
    
 def plot_histogram_chart(df:pd.DataFrame):
     """
-    Plots a 2D histogram chart of 'GHI' versus 'RH' from the given DataFrame.
+    Plots a 2D histogram (heatmap) of 'GHI' versus 'RH' from the given DataFrame.
 
     Parameters:
         df (pd.DataFrame): The input DataFrame containing at least the 'GHI' and 'RH' columns.
 
     Displays:
-        A histogram plot with kernel density estimation (KDE) overlay, showing the distribution of 'GHI' and 'RH'.
+        A 2D histogram plot showing the joint distribution of 'GHI' and 'RH'.
     """
     plt.figure(figsize=(10, 8))
-    sb.histplot(df, x='GHI', y='RH', kde=True)
-    plt.xticks(ticks=df['GHI'], labels=df['RH']) 
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.title('GHI')
+    sb.histplot(data=df, x='GHI', y='RH', bins=30, pthresh=0.1, cmap='Blues')
+    plt.title('2D Histogram of GHI vs RH')
+    plt.xlabel('GHI')
+    plt.ylabel('RH')
+    plt.grid(axis='both', linestyle='--', alpha=0.7)
+    plt.tight_layout()
     plt.show()
 
 def plot_avg_moda_modb(df:pd.DataFrame):
+    """
+    Plots the average values of 'ModA' and 'ModB' columns grouped by the 'Cleaning' flag in the given DataFrame.
+
+    This function calculates the mean of 'ModA' and 'ModB' for each unique value in the 'Cleaning' column,
+    reshapes the data for plotting, and displays a bar plot comparing the average values of both modules
+    across different cleaning states.
+
+    Parameters:
+        df (pd.DataFrame): Input DataFrame containing at least the columns 'Cleaning', 'ModA', and 'ModB'.
+
+    Returns:
+        None: Displays a bar plot of the average values and prints the grouped averages.
+    """
     average_mod_by_cleaning = df.groupby('Cleaning')[['ModA', 'ModB']].mean().reset_index()
     print(average_mod_by_cleaning)
 
@@ -148,6 +190,15 @@ def plot_avg_moda_modb(df:pd.DataFrame):
     plt.show()
 
 def plot_redial(df:pd.DataFrame):
+    """
+    Plots a polar scatter plot of wind speed versus wind direction.
+    Parameters:
+        df (pd.DataFrame): A pandas DataFrame containing at least two columns:
+            - 'WD': Wind direction in degrees.
+            - 'WS': Wind speed.
+    The function converts wind direction from degrees to radians and plots wind speed as the radius.
+    The polar plot is oriented such that 0 degrees points east and increases clockwise.
+    """
     theta = np.deg2rad(df['WD'])
     r = df['WS']
     fig, ax = plt.subplots(figsize=(8, 8), subplot_kw={'projection': 'polar'})
@@ -164,6 +215,18 @@ def plot_redial(df:pd.DataFrame):
     plt.show()
 
 def plot_RH_relation(df:pd.DataFrame):
+    """
+    Plots the relationship between relative humidity (RH) and two variables: ambient temperature (Tamb) and global horizontal irradiance (GHI).
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing at least the columns 'RH', 'Tamb', and 'GHI'.
+
+    The function creates two line plots:
+        1. RH vs Tamb
+        2. RH vs GHI
+
+    Displays each plot sequentially.
+    """
     sb.lineplot(df, x='RH', y='Tamb')
     plt.title(f' GHI')
     plt.show()
