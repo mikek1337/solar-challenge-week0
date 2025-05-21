@@ -49,8 +49,7 @@ def plot_time_series(df:pd.DataFrame):
     plot_cols = ['GHI', 'DNI', 'DHI', 'Tamb']
 
     for col in plot_cols:
-        sb.lineplot(df, x='Timestamp', y=col)
-        #plt.plot(df['Timestamp'], df[col], label=col)
+        sb.lineplot(df, x='Timestamp', y=col, label=col)
 
     plt.xlabel('Timestamp')
     plt.ylabel('Value')
